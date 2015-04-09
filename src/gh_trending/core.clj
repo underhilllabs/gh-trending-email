@@ -31,7 +31,19 @@
 
 ;;(first (map html/html (html/select (html/html-resource (java.net.URL. "https://github.com/trending?l=clojure")) #{[:li.repo-list-item]} )))
 
+(defn strip-ws 
+  "strips white space and newlines"
+  [s] 
+  (clojure.string/replace s #"\s+|\\n" ""))
 
+
+(defn get-repo-names
+  [url]
+  (into [] 
+        (->> (html/select (html/html-resource (java.net.URL. "https://github.com/trending?l=clojure")) 
+                          #{[:h3.repo-list-name ][:p.repo-list-description]} )
+             (map html/text)
+             (strip-ws))))
 
 (def extract [node]
   (let [url (first (html/select [node] *repo-url*))
